@@ -8,7 +8,13 @@
 </head>
 
 <body>
-	<div class="ticketContainer">
+	<div class="uiContainer">
+		<div class="userStatsContainer">
+			<div>Cash: <div class="stat" id="stat-cash">0</div></div>
+			<hr />
+			<div>Total games: <div class="stat" id="stat-games">0</div></div>
+			<div>Total wins: <div class="stat" id="stat-wins">0</div></div>
+		</div>
 		<div class="lotteryTicket" id="lotteryTicket">
 			<!-- <div class="lotteryBox">1</div> -->
 			<!-- <div class="lotteryBox">59</div> -->
@@ -24,9 +30,22 @@
 
 
 <style type="text/css">
-.ticketContainer {
+.uiContainer {
 	text-align: center;
 }
+	.uiContainer > * {
+		vertical-align: top;
+	}
+
+/* stats box */
+.userStatsContainer {
+	display: inline-block;
+}
+	.userStatsContainer .stat {
+		display: inline-block;
+	}
+
+/* lottery box */
 .lotteryTicket {
 	display: inline-flex;
 	flex-wrap: wrap;
@@ -35,31 +54,33 @@
 	padding-top: 4px;
 	width: 300px;
 }
-.lotteryBox {
-	border: 1px solid black;
-	padding: 4px;
-	margin-right: 4px;
-	margin-bottom: 4px;
-	width: 16px;
-	height: 16px;
-	text-align: center;
-	font-weight: bold;
-	background: #ddd;
-	cursor: pointer;
-}
-	.lotteryBox.highlight {
-		background: yellow;
+	.lotteryBox {
+		border: 1px solid black;
+		padding: 4px;
+		margin-right: 4px;
+		margin-bottom: 4px;
+		width: 16px;
+		height: 16px;
+		text-align: center;
+		font-weight: bold;
+		background: #ddd;
+		cursor: pointer;
 	}
+		.lotteryBox.highlight {
+			background: yellow;
+		}
+
+/* buttons */
 .ticketButtonContainer {
 	display: inline-block;
 	vertical-align: top;
 }
-.ticketButtonContainer button {
-	display: block;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	cursor: pointer;
-}
+	.ticketButtonContainer button {
+		display: block;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		cursor: pointer;
+	}
 </style>
 
 
@@ -67,11 +88,17 @@
 
 // consts
 const LOTTERY_MAX = 59;
+// const LOTTERY_MAX = 19;
 const LOTTERY_PICK_COUNT = 6;
 
 // main game
 const Lottery = {
 	selected: [],
+	results: [],
+
+	cash: 0,
+	games: 0,
+	wins: 0,
 
 	init() {
 		const ticket = document.querySelector('#lotteryTicket');
@@ -87,18 +114,23 @@ const Lottery = {
 		// init UI
 		this.updateUI();
 		document.querySelector('#button-lucky').onclick = () => this.luckyDip();
-		// document.querySelector('#button-start').onclick = () => this.reset();
+		document.querySelector('#button-start').onclick = () => this.startGame();
 		document.querySelector('#button-reset').onclick = () => this.reset();
 	},
 
 	reset() {
 		// clear selected ticket boxes
 		this.selected.splice(0, this.selected.length);
+		this.results.splice(0, this.results.length);
 		// set ui state
 		this.updateUI();
 	},
 
 	updateUI() {
+		// update user stats
+		document.querySelector('#stat-cash').innerHTML = this.cash;
+		document.querySelector('#stat-games').innerHTML = this.games;
+		document.querySelector('#stat-wins').innerHTML = this.wins;
 		// reflect state of selected numbers in the lottery ticker
 		// document.querySelectorAll('#lotteryTicket .lotteryBox').forEach(box => box.classList.remove('highlight'));
 		// this.selected.forEach(num => document.querySelector(`#lotteryTicket .lotteryBox[value="${num}"]`).classList.add('highlight'));
@@ -120,7 +152,7 @@ const Lottery = {
 		else if (this.selected.length >= LOTTERY_PICK_COUNT) 
 			return;
 		else 
-			this.selected.push(i), this.selected.sort();
+			this.selected.push(i), this.selected.sort((a, b) => a - b);
 		// set ui state
 		this.updateUI();
 	},
@@ -133,9 +165,40 @@ const Lottery = {
 			const num = (Math.random() * LOTTERY_MAX + 1) | 0;
 			if (this.selected.indexOf(num) === -1) this.selected.push(num);
 		}
-		this.selected.sort();
-		console.log(this.selected);
+		this.selected.sort((a, b) => a - b);
+		console.log('lucky-dip', this.selected);
 		// reflect in UI
+		this.updateUI();
+	},
+
+	getWinAmount(matchCount) {
+		switch (matchCount) {
+		case 3:   return 50;
+		case 4:   return 100;
+		case 5:   return 200;
+		case 6:   return 500;
+		default:  return 0;
+		}
+	},
+
+	startGame() {
+		// clear last game
+		this.results.splice(0, this.results.length);
+		// select 6 unique numbers at random
+		while (this.results.length < LOTTERY_PICK_COUNT) {
+			const num = (Math.random() * LOTTERY_MAX + 1) | 0;
+			if (this.results.indexOf(num) === -1) this.results.push(num);
+		}
+		this.results.sort((a, b) => a - b);
+		console.log('results', this.results);
+		// check for matches
+		let match = this.results.filter(i => this.selected.indexOf(i) > -1);
+		console.log('match', match);
+		console.log(`You matched ${match.length} numbers.`);
+		// update stats
+		this.games++;
+		if (this.getWinAmount(match.length) > 0) this.wins++;
+		this.cash += this.getWinAmount(match.length);
 		this.updateUI();
 	}
 
