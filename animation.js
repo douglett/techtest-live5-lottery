@@ -1,7 +1,11 @@
 // consts
+// import LOTTERY_MAX;
+// import LOTTERY_PICK_COUNT;
 const BALLW = 100;
+const FALL_SPEED = 24;
 
 
+// animation namespace
 const Animation = {
 	screen: null,
 	gradient: null,
@@ -39,17 +43,15 @@ const Animation = {
 				y: 0,
 				win: false
 			});
-			// this.drawBall(i, i); // initial value
 		}
-		// first paint
+		// set up initial ball values and do first paint
 		this.reset();
-		// this.draw();
 	},
 
 	reset() {
 		// reset animation vars
 		this.winAmount = 0;
-		// reset ball values
+		// reset balls
 		this.balls.forEach((ball, index) => {
 			ball.win = false;
 			ball.y = 0;
@@ -72,6 +74,23 @@ const Animation = {
 			if (ball.win) ctx.drawImage(this.wintext, (ball.x + (ball.canvas.width - this.wintext.width) / 2), 100);
 		});
 		ctx.resetTransform();  // reset align
+		// show win value
+		if (this.winAmount > 0) {
+			ctx.fillStyle = 'gold';
+			ctx.strokeStyle = 'black';
+			ctx.lineWidth = 3;
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			const txt = `You win ${this.winAmount}$!`
+			// big text
+			ctx.font = `italic bold 80px serif`;
+			ctx.fillText(txt, this.screen.width/2, this.screen.height/2);
+			ctx.strokeText(txt, this.screen.width/2, this.screen.height/2);
+			// top text
+			// ctx.font = `italic bold 50px serif`;
+			// ctx.fillText(txt, this.screen.width/2, 30);
+			// ctx.strokeText(txt, this.screen.width/2, 30);
+		}
 	},
 
 	drawBall(index, value) {
@@ -100,7 +119,7 @@ const Animation = {
 		ctx.fillStyle = 'black';
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-		ctx.font = `bold ${(BALLW / 3) | 0}px serif`;
+		// ctx.font = `bold ${(BALLW / 3) | 0}px serif`;
 		ctx.font = `bold 40px serif`;
 		ctx.fillText(value, BALLW/2, BALLW/2);
 	},
@@ -116,7 +135,6 @@ const Animation = {
 	},
 
 	animateBalls(winAmount) {
-		const FALL_SPEED = 24;
 		// hide all balls and win amount
 		this.balls.forEach(ball => ball.y = -130);
 		this.winAmount = 0;
@@ -125,13 +143,24 @@ const Animation = {
 			const anim = () => {
 				// drop each ball in turn
 				let animating = this.balls.some(ball => {
-					if   (ball.y >= 0) { ball.y = 0; return false; }
-					else { ball.y += FALL_SPEED; return true; }
+					if (ball.y >= 0) { 
+						ball.y = 0; 
+						return false;  // don't stop the loop - animate next ball
+					}
+					else { 
+						ball.y += FALL_SPEED; 
+						return true;  // break animation loop
+					}
 				});
 				this.draw();
 				// if still animating, continue
 				if (animating) requestAnimationFrame(anim);
-				else this.winAmount = winAmount, this.draw(), resolve();
+				// do a little pause and end animation
+				else setTimeout(() => {
+						this.winAmount = winAmount;
+						this.draw();
+						resolve();
+					});
 			}
 			anim();
 		});

@@ -1,5 +1,5 @@
 // consts
-const LOTTERY_MAX = 59;
+const LOTTERY_MAX = 59;  // real value
 // const LOTTERY_MAX = 14;  // cheat value (for testing)
 const LOTTERY_PICK_COUNT = 6;
 
