@@ -1,7 +1,8 @@
 // consts
-const LOTTERY_MAX = 59;  // real value
-// const LOTTERY_MAX = 14;  // cheat value (for testing)
 const LOTTERY_PICK_COUNT = 6;
+const LOTTERY_MAX_DEFAULT = 59;  // real value
+const LOTTERY_MAX_CHEAT = 10;  // cheat value (for testing)
+let LOTTERY_MAX = LOTTERY_MAX_DEFAULT;
 
 
 // main game
@@ -16,6 +17,7 @@ const Lottery = {
 
 	init() {
 		const ticket = document.querySelector('#lotteryTicket');
+		ticket.innerHTML = '';  // clear old elements
 		for (let i = 1; i <= LOTTERY_MAX; i++) {
 			const box = document.createElement('div');
 			box.className = 'lotteryBox';
@@ -26,10 +28,12 @@ const Lottery = {
 			ticket.appendChild(box);
 		}
 		// init UI
+		this.selected = [];
 		this.updateUI();
 		document.querySelector('#button-lucky').onclick = () => this.luckyDip();
 		document.querySelector('#button-start').onclick = () => this.startGame();
 		document.querySelector('#button-reset').onclick = () => this.reset();
+		document.querySelector('#button-cheat').onclick = () => this.cheat();
 	},
 
 	reset() {
@@ -41,6 +45,19 @@ const Lottery = {
 		document.querySelector('#resultsContainer').innerHTML = 'Ready to play?'
 		// set ui state
 		this.updateUI();
+	},
+
+	cheat() {
+		if (LOTTERY_MAX === LOTTERY_MAX_DEFAULT) {
+			console.log('Activated cheat mode!');
+			LOTTERY_MAX = LOTTERY_MAX_CHEAT;
+			this.init();
+		}
+		else {
+			console.log('Cheat mode deactivated');
+			LOTTERY_MAX = LOTTERY_MAX_DEFAULT;
+			this.init();
+		}
 	},
 
 	updateUI() {
@@ -59,6 +76,7 @@ const Lottery = {
 		// disable buttons if loading
 		document.querySelector('#button-lucky').disabled = this.loading;
 		document.querySelector('#button-reset').disabled = this.loading;
+		document.querySelector('#button-cheat').disabled = this.loading;
 		// report game state and results
 		const resbox = document.querySelector('#resultsContainer');
 		if (this.results && this.results.winAmount > 0)
