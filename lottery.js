@@ -38,6 +38,7 @@ const Lottery = {
 		this.results = null;
 		// clear visual animation
 		Animation.reset();
+		document.querySelector('#resultsContainer').innerHTML = 'Ready to play?'
 		// set ui state
 		this.updateUI();
 	},
@@ -55,9 +56,19 @@ const Lottery = {
 		});
 		// allow spins if 6 numbers selected
 		document.querySelector('#button-start').disabled = this.loading || this.selected.length < LOTTERY_PICK_COUNT;
-		// disable if loading
+		// disable buttons if loading
 		document.querySelector('#button-lucky').disabled = this.loading;
 		document.querySelector('#button-reset').disabled = this.loading;
+		// report game state and results
+		const resbox = document.querySelector('#resultsContainer');
+		if (this.results && this.results.winAmount > 0)
+			resbox.classList.add('win'), resbox.innerHTML = `Congratulations! You win ${this.results.winAmount} credits`;
+		else if (this.results && this.results.winAmount == 0)
+			resbox.classList.remove('win'), resbox.innerHTML = 'No win.';
+		else if (this.loading)
+			resbox.classList.remove('win'), resbox.innerHTML = '';
+		else
+			resbox.classList.remove('win'), resbox.innerHTML = 'Ready to play?';
 	},
 
 	clickBox(i) {

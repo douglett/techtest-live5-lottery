@@ -1,3 +1,4 @@
+/* all UI elements go here */
 .uiContainer {
 	text-align: center;
 }
@@ -51,6 +52,26 @@
 		cursor: pointer;
 	}
 
+/* show game results */
+#resultsContainer {
+	display: block;
+	height: 35px;
+	margin-bottom: 10px;
+	font: bold italic 30px serif;
+	color: #555;
+}
+	#resultsContainer.win {
+		color: gold;
+		text-stroke: 1px black;
+		animation: pulseText 1s infinite;
+	}
+	@keyframes pulseText {
+		0%   { color: rgb(170, 170, 0); }
+		50%  { color: rgb(230, 230, 0); }
+		100% { color: rgb(170, 170, 0); }
+	}
+
+/* virtual canvas 'screen' for animation */
 #screen {
 	display: block;
 	border: 2px solid black;

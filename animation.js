@@ -3,6 +3,7 @@
 // import LOTTERY_PICK_COUNT;
 const BALLW = 100;
 const FALL_SPEED = 24;
+const SHOW_WIN_ANIMATION = false;
 
 
 // animation namespace
@@ -75,7 +76,7 @@ const Animation = {
 		});
 		ctx.resetTransform();  // reset align
 		// show win value
-		if (this.winAmount > 0) {
+		if (SHOW_WIN_ANIMATION && this.winAmount > 0) {
 			ctx.fillStyle = 'gold';
 			ctx.strokeStyle = 'black';
 			ctx.lineWidth = 3;
