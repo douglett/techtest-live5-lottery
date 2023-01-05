@@ -1,0 +1,60 @@
+.uiContainer {
+	text-align: center;
+}
+	.uiContainer > * {
+		vertical-align: top;
+	}
+
+/* stats box */
+.userStatsContainer {
+	display: inline-block;
+	width: 116px;
+}
+	.userStatsContainer .stat {
+		display: inline-block;
+	}
+
+/* lottery box */
+.lotteryTicket {
+	display: inline-flex;
+	flex-wrap: wrap;
+	border: 1px solid black;
+	padding-left: 4px;
+	padding-top: 4px;
+	width: 300px;
+}
+	.lotteryBox {
+		border: 1px solid black;
+		padding: 4px;
+		margin-right: 4px;
+		margin-bottom: 4px;
+		width: 16px;
+		height: 16px;
+		text-align: center;
+		font-weight: bold;
+		background: #ddd;
+		cursor: pointer;
+	}
+		.lotteryBox.highlight {
+			background: yellow;
+		}
+
+/* buttons */
+.ticketButtonContainer {
+	display: inline-block;
+	vertical-align: top;
+}
+	.ticketButtonContainer button {
+		display: block;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		cursor: pointer;
+	}
+
+#screen {
+	display: block;
+	border: 2px solid black;
+	margin-bottom: 20px;
+	margin-left: auto;
+	margin-right: auto;
+}
