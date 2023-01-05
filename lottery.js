@@ -90,7 +90,6 @@ const Lottery = {
 	},
 
 	clickBox(i) {
-		// console.log(i);
 		// handle selected boxes
 		let numpos;
 		if ((numpos = this.selected.indexOf(i)) > -1)
@@ -149,6 +148,8 @@ const Lottery = {
 	},
 
 	getResults(picks) {
+		// Note: this is where a fetch request would go in a real game
+		// I'll just return some results directly to save some time
 		picks = picks.map(p => p);  // clone array
 		const results = [];
 		// select 6 unique numbers at random
@@ -159,7 +160,6 @@ const Lottery = {
 		}
 		results.sort((a, b) => a.value - b.value);
 		// check for matches
-		// results.forEach(result => result.win = picks.indexOf(result.value) > -1);
 		let matchCount = 0;
 		results.forEach(result => {
 			if (picks.indexOf(result.value) > -1)
