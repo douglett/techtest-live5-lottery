@@ -1,6 +1,6 @@
 // consts
 const LOTTERY_MAX = 59;
-// const LOTTERY_MAX = 19;
+// const LOTTERY_MAX = 14;  // cheat value (for testing)
 const LOTTERY_PICK_COUNT = 6;
 
 
@@ -36,6 +36,8 @@ const Lottery = {
 		// clear selected ticket boxes
 		this.selected = [];
 		this.results = null;
+		// clear visual animation
+		Animation.reset();
 		// set ui state
 		this.updateUI();
 	},
@@ -86,33 +88,10 @@ const Lottery = {
 		this.updateUI();
 	},
 
-	_startGame() {
-		// clear last game
-		this.results.splice(0, this.results.length);
-		// select 6 unique numbers at random
-		while (this.results.length < LOTTERY_PICK_COUNT) {
-			const num = (Math.random() * LOTTERY_MAX + 1) | 0;
-			if (this.results.indexOf(num) === -1) this.results.push(num);
-		}
-		this.results.sort((a, b) => a - b);
-		console.log('results', this.results);
-		// check for matches
-		let matches = this.results.filter(i => this.selected.indexOf(i) > -1);
-		console.log('matches', matches);
-		console.log(`You matched ${matches.length} numbers.`);
-		// animate results
-		Animation.setResults(this.results, matches);
-		// update stats
-		this.games++;
-		if (this.getWinAmount(matches.length) > 0) this.wins++;
-		this.cash += this.getWinAmount(matches.length);
-		this.updateUI();
-	},
-
 	startGame() {
 		// clear last game
 		this.results = null;
-		// get results
+		// get results - do a fake API call of sorts
 		Promise.resolve()
 			// begin
 			.then(() => {
@@ -127,7 +106,7 @@ const Lottery = {
 				console.log('results', results);
 			})
 			// show results animation
-			.then(() => Animation.setResults(this.results.results))
+			.then(() => Animation.setResults(this.results.results, this.results.winAmount))
 			// end
 			.then(() => {
 				// update stats
@@ -146,7 +125,7 @@ const Lottery = {
 		// select 6 unique numbers at random
 		while (results.length < LOTTERY_PICK_COUNT) {
 			const num = (Math.random() * LOTTERY_MAX + 1) | 0;
-			if (results.indexOf(num) === -1) 
+			if (!results.find(res => res.value === num))
 				results.push({ value: num, win: false });
 		}
 		results.sort((a, b) => a.value - b.value);
