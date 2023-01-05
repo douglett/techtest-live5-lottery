@@ -58,13 +58,14 @@ const Animation = {
 		ctx.resetTransform();  // reset align
 	},
 
-	setResults(results, matches) {
+	setResults(results) {
 		const ctx = this.screen.getContext('2d');
-		results.forEach((value, index) => {
-			this.drawBall(index, value);
-			this.balls[index].win = matches.indexOf(value) > -1;
+		results.forEach((res, index) => {
+			this.drawBall(index, res.value);
+			this.balls[index].win = res.win;
 		});
 		this.draw();
+		// return new Promise(resolve => setTimeout(resolve, 1000));
 	},
 
 	drawBall(index, value) {

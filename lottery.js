@@ -7,7 +7,8 @@ const LOTTERY_PICK_COUNT = 6;
 // main game
 const Lottery = {
 	selected: [],
-	results: [],
+	results: null,
+	loading: false,
 
 	cash: 0,
 	games: 0,
@@ -33,8 +34,8 @@ const Lottery = {
 
 	reset() {
 		// clear selected ticket boxes
-		this.selected.splice(0, this.selected.length);
-		this.results.splice(0, this.results.length);
+		this.selected = [];
+		this.results = null;
 		// set ui state
 		this.updateUI();
 	},
@@ -51,7 +52,10 @@ const Lottery = {
 			if (this.selected.indexOf(num) > -1) box.classList.add('highlight');
 		});
 		// allow spins if 6 numbers selected
-		document.querySelector('#button-start').disabled = this.selected.length < LOTTERY_PICK_COUNT;
+		document.querySelector('#button-start').disabled = this.loading || this.selected.length < LOTTERY_PICK_COUNT;
+		// disable if loading
+		document.querySelector('#button-lucky').disabled = this.loading;
+		document.querySelector('#button-reset').disabled = this.loading;
 	},
 
 	clickBox(i) {
@@ -82,17 +86,7 @@ const Lottery = {
 		this.updateUI();
 	},
 
-	getWinAmount(matchCount) {
-		switch (matchCount) {
-		case 3:   return 50;
-		case 4:   return 100;
-		case 5:   return 200;
-		case 6:   return 500;
-		default:  return 0;
-		}
-	},
-
-	startGame() {
+	_startGame() {
 		// clear last game
 		this.results.splice(0, this.results.length);
 		// select 6 unique numbers at random
@@ -113,6 +107,68 @@ const Lottery = {
 		if (this.getWinAmount(matches.length) > 0) this.wins++;
 		this.cash += this.getWinAmount(matches.length);
 		this.updateUI();
-	}
+	},
 
+	startGame() {
+		// clear last game
+		this.results = null;
+		// get results
+		Promise.resolve()
+			// begin
+			.then(() => {
+				this.loading = true;
+				this.updateUI();
+			})
+			// API call 
+			.then(() => this.getResults(this.selected))
+			// save results
+			.then(results => {
+				this.results = results;
+				console.log('results', results);
+			})
+			// show results animation
+			.then(() => Animation.setResults(this.results.results))
+			// end
+			.then(() => {
+				// update stats
+				this.games++;
+				if (this.results.winAmount > 0) this.wins++;
+				this.cash += this.results.winAmount;
+				// enable UI
+				this.loading = false;
+				this.updateUI();
+			});
+	},
+
+	getResults(picks) {
+		picks = picks.map(p => p);  // clone array
+		const results = [];
+		// select 6 unique numbers at random
+		while (results.length < LOTTERY_PICK_COUNT) {
+			const num = (Math.random() * LOTTERY_MAX + 1) | 0;
+			if (results.indexOf(num) === -1) 
+				results.push({ value: num, win: false });
+		}
+		results.sort((a, b) => a.value - b.value);
+		// check for matches
+		// results.forEach(result => result.win = picks.indexOf(result.value) > -1);
+		let matchCount = 0;
+		results.forEach(result => {
+			if (picks.indexOf(result.value) > -1)
+				result.win = true, matchCount++;
+		});
+		const winAmount = this.getWinAmount(matchCount);
+		// return fake API result
+		return { picks, results, matchCount, winAmount };
+	},
+
+	getWinAmount(matchCount) {
+		switch (matchCount) {
+		case 3:   return 50;
+		case 4:   return 100;
+		case 5:   return 200;
+		case 6:   return 500;
+		default:  return 0;
+		}
+	}
 };
