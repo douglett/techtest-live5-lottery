@@ -103,13 +103,15 @@ const Lottery = {
 		this.results.sort((a, b) => a - b);
 		console.log('results', this.results);
 		// check for matches
-		let match = this.results.filter(i => this.selected.indexOf(i) > -1);
-		console.log('match', match);
-		console.log(`You matched ${match.length} numbers.`);
+		let matches = this.results.filter(i => this.selected.indexOf(i) > -1);
+		console.log('matches', matches);
+		console.log(`You matched ${matches.length} numbers.`);
+		// animate results
+		Animation.setResults(this.results, matches);
 		// update stats
 		this.games++;
-		if (this.getWinAmount(match.length) > 0) this.wins++;
-		this.cash += this.getWinAmount(match.length);
+		if (this.getWinAmount(matches.length) > 0) this.wins++;
+		this.cash += this.getWinAmount(matches.length);
 		this.updateUI();
 	}
 
